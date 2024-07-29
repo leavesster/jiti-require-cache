@@ -2,24 +2,22 @@ import jiti from "jiti";
 import {writeFileSync} from "fs";
 import {resolve} from "path";
 (process as any).JITI_DEBUG = 1;
-jiti(__filename, {
-  cache: false,
-  debug: true,
-  requireCache: false,
-  v8cache: false,
-}).register();
+jiti(__filename, {}).register();
 
-const p = "./module.ts";
 
-const resolveP = resolve(__dirname, "..", p);
-console.log("dir", __dirname, "resolveP", resolveP);
+const p = "./src/module.ts";
+const cwd = process.cwd();
+const resolveP = resolve(cwd, p);
+console.log("resolveP", resolveP);
 
 (async () => {
-    const ts = await import(resolveP);
+    const ts = require(resolveP);
     ts.main();
     change();
 
-    const ts2 = await import(resolveP);
+    delete require.cache[resolveP];
+
+    const ts2 = require(resolveP);
     ts2.main();
 
     reset();
